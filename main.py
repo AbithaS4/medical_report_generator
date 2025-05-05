@@ -1,27 +1,51 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from database import Base, engine
-import medical_rpt
+from models import PatientDB, MedicalReportDB
+from schemas import PatientCreate, MedicalReportCreate, MedicalReportResponse, Patient
+from database import SessionLocal, engine
+from sqlalchemy.orm import Session
+from fastapi import APIRouter
+from typing import List  # Import List from typing module
 
-# ✅ Initialize FastAPI app
+# Create the database tables
+PatientDB.metadata.create_all(bind=engine)
+MedicalReportDB.metadata.create_all(bind=engine)
+
 app = FastAPI()
 
-# ✅ Enable CORS for the local frontend (Next.js on port 3000)
+# Enable CORS for your frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # ✅ Allow frontend requests from Next.js
+    allow_origins=["*"],  # Allow all origins or specify the frontend URL
     allow_credentials=True,
-    allow_methods=["*"],  # ✅ Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # ✅ Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# ✅ Create database tables
-Base.metadata.create_all(bind=engine)
+# Dependency for getting the DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# ✅ Include the routes from medical_rpt.py
-app.include_router(medical_rpt.router)
+# Router for patients
+patient_router = APIRouter()
 
-# ✅ Health check endpoint
-@app.get("/")
-def root():
-    return {"message": "Medical Report API is running!"}
+# POST route for adding a new patient
+@patient_router.post("/patients", response_model=Patient)
+def add_patient(patient: PatientCreate, db: Session = Depends(get_db)):  # Fixed: Added Depends
+    db_patient = PatientDB(name=patient.name, age=patient.age, gender=patient.gender, phone=patient.phone)
+    db.add(db_patient)
+    db.commit()
+    db.refresh(db_patient)
+    return db_patient
+
+# GET route to fetch all patients
+@patient_router.get("/patients", response_model=List[Patient])  # Fixed: Added List import
+def get_patients(db: Session = Depends(get_db)):
+    return db.query(PatientDB).all()
+
+# Add the patient router to the main app
+app.include_router(patient_router)
