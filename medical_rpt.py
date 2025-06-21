@@ -1,24 +1,62 @@
-from fastapi import APIRouter
-from schemas import MedicalReportCreate, MedicalReportResponse
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from . import models, schemas, database
+from fastapi.responses import StreamingResponse
+from .pdf_generator import generate_report_pdf
+import json
 
 router = APIRouter()
 
-# Sample in-memory storage (just for testing)
-fake_reports = []
+@router.post("/")
+def create_report(report: schemas.MedicalReportCreate, db: Session = Depends(database.get_db)):
+    db_report = models.MedicalReport(
+        patient_id=report.patient_id,
+        report_type=report.report_type,
+        report_data=json.dumps(report.report_data)
+    )
+    db.add(db_report)
+    db.commit()
+    return {"message": "Report saved successfully"}
 
-@router.post("/reports", response_model=MedicalReportResponse)
-def create_medical_report(report: MedicalReportCreate):
-    new_report = {
-        "id": len(fake_reports) + 1,
-        "patient_id": report.patient_id,
-        "diagnosis": report.diagnosis,
-        "test_results": report.test_results,
-        "notes": report.notes,
+@router.get("/")
+def get_all_reports(db: Session = Depends(database.get_db)):
+    reports = db.query(models.MedicalReport).all()
+    return [
+        {
+            "id": r.id,
+            "patient": {
+                "id": r.patient.id,
+                "name": r.patient.name
+            },
+            "report_type": r.report_type,
+            "report_data": json.loads(r.report_data)
+        } for r in reports
+    ]
+
+@router.get("/{report_id}")
+def get_report(report_id: int, db: Session = Depends(database.get_db)):
+    report = db.query(models.MedicalReport).get(report_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return {
+        "id": report.id,
+        "patient": {
+            "id": report.patient.id,
+            "name": report.patient.name
+        },
+        "report_type": report.report_type,
+        "report_data": json.loads(report.report_data)
     }
-    fake_reports.append(new_report)
-    return new_report
+@router.get("/{report_id}/pdf")
+def download_pdf(report_id: int, db: Session = Depends(database.get_db)):
+    report = db.query(models.MedicalReport).get(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
 
-@router.get("/reports", response_model=List[MedicalReportResponse])
-def get_reports():
-    return fake_reports
+    patient_name = report.patient.name
+    report_data = json.loads(report.report_data)
+    pdf_buffer = generate_report_pdf(patient_name, report.report_type, report_data)
+
+    return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={
+        "Content-Disposition": f"attachment; filename=report_{report_id}.pdf"
+    })

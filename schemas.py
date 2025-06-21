@@ -1,36 +1,21 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
 
-# ---------------- Patients ----------------
-class Patient(BaseModel):
-    id: int
+class PatientBase(BaseModel):
     name: str
     age: int
     gender: str
     phone: str
 
+class PatientCreate(PatientBase):
+    pass
+
+class Patient(PatientBase):
+    id: int
     class Config:
-        from_attributes = True  # Pydantic v2
+        orm_mode = True
 
-class PatientCreate(BaseModel):
-    name: str
-    age: int
-    gender: str
-    phone: str  # ✅ added phone
-
-# ---------------- Medical Reports ----------------
 class MedicalReportCreate(BaseModel):
     patient_id: int
-    diagnosis: str
-    test_results: str
-    notes: Optional[str] = None
-
-class MedicalReportResponse(BaseModel):
-    id: int
-    patient_id: int
-    diagnosis: str
-    test_results: str
-    notes: Optional[str]
-
-    class Config:
-        from_attributes = True
+    report_type: str
+    report_data: dict  # Expecting key-value pairs like {"Hemoglobin": "14", "WBC Count": "8000"}
