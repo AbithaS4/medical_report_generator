@@ -42,6 +42,12 @@ A FastAPI-based backend for generating and managing medical reports, including P
 ```bash
  uvicorn main:app --reload
     ```
+
+
+
+
+
+
 5. Visit the interactive API docs at:
    Swagger UI: http://127.0.0.1:8000/docs
 
