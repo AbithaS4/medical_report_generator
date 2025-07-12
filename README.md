@@ -41,7 +41,7 @@ A FastAPI-based backend for generating and managing medical reports, including P
 4.Run the server:
 ```bash
  uvicorn main:app --reload
-    ```
+```
 
 
 
