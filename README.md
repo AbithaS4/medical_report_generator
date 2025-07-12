@@ -42,4 +42,31 @@ A FastAPI-based backend for generating and managing medical reports, including P
 ```bash
  uvicorn main:app --reload
     ```
+5. Visit the interactive API docs at:
+   Swagger UI: http://127.0.0.1:8000/docs
+
+## Technologies Used
+
+- FastAPI – Web API framework
+- Uvicorn – ASGI server for development
+- SQLAlchemy – Database ORM
+- SQLite – Lightweight relational database
+- ReportLab – PDF report generation
+- Pydantic – Data validation using schemas
+- Python 3.10+
+
+## How It Works
+
+1. The client (such as a frontend app) sends a POST request to /reports/ with patient details and test data.
+2. The server stores this data and generates a PDF using ReportLab.
+
+3. The generated report is sent back as a downloadable file.
+
+## Future Enhancements
+
+- Add user authentication (doctor login, JWT)
+- Save reports to cloud storage (e.g., AWS S3)
+- Add Docker support for easy deployment
+- Expand to include more report types (e.g., X-ray, ECG)
+- Add automated testing (e.g., using pytest)
 
