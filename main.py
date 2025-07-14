@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from . import models
+from medical_report_generator import models
 from .database import engine
 from fastapi.middleware.cors import CORSMiddleware
 
