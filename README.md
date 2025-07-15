@@ -1,26 +1,46 @@
-#  Medical Report Generator (FastAPI Backend)
+# Medical Report Generator Backend
 
-A backend application built with **FastAPI** for generating medical reports.
+A **FastAPI**-based backend for generating and managing medical reports, including PDF export functionality.It allows submitting patient and test data, stores it using SQLAlchemy and SQLite, and returns downloadable reports via dynamically generated PDFs using ReportLab.
 
----
 
-##  Installation
+## Features
+-  Medical report creation with JSON data storage
+-  Dynamic PDF report generation
+-  RESTful API with SQLite database (easy to switch to PostgreSQL)
+-  RESTful API with CORS enabled for frontend integration
 
-Install the required packages:
+## Tech Stack
 
+| Component      | Tech             |
+|----------------|----------------- |
+| Framework      | FastAPI          |
+| ORM            | SQLAlchemy       |
+| PDF Generator  | ReportLab        |
+| Database       | SQLite           |
+| Docs UI        | Swagger / Redoc  |
+
+
+# Installation
+
+1.  Clone the repository:
 ```bash
-pip install fastapi uvicorn
-pip install sqlalchemy
-pip install reportlab
+    git clone https://github.com/yourusername/medical-report-generator.git
+    cd medical-report-generator/backend
 ```
 
-## Getting Started
-
-To run the backend use;
+2.  Create a Virtual Environment (Optional)
 ```bash
-uvicorn medical_report_generator.main:app --reload 
-uvicorn main:app --reload
-```
-Then open your browser at:
+    python -m venv venv
+    source venv/bin/activate  # Windows: venv\Scripts\activate
+```  
 
-[http://localhost:8000/docs]
+3.  Install Dependencies
+```bash
+   pip install -r requirements.txt
+```
+
+
+4.  Run the development server:
+```bash
+  uvicorn main:app --reload
+```
