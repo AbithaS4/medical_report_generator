@@ -8,7 +8,7 @@ class Patient(Base):
     name = Column(String)
     age = Column(Integer)
     gender = Column(String)
-    city = Column(String)
+    city = Column(String) 
     phone = Column(String)
 
     reports = relationship("MedicalReport", back_populates="patient")
