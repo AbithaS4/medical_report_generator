@@ -15,8 +15,12 @@ class Patient(PatientBase):
     id: int
     class Config:
         orm_mode = True
-
+    
 class MedicalReportCreate(BaseModel):
     patient_id: int
     report_type: str
-    report_data: dict  # Expecting key-value pairs like {"Hemoglobin": "14", "WBC Count": "8000"}
+    report_data: dict  
+
+
+
+    

@@ -21,3 +21,7 @@ class MedicalReport(Base):
     report_data = Column(Text)  # Store as JSON string
 
     patient = relationship("Patient", back_populates="reports")
+
+
+
+
