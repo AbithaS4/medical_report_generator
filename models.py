@@ -11,7 +11,7 @@ class Patient(Base):
     city = Column(String) 
     phone = Column(String)
 
-    reports = relationship("MedicalReport", back_populates="patient")
+    reports = relationship("MedicalReport", back_populates="patient", cascade="all, delete")
 
 class MedicalReport(Base):
     __tablename__ = "reports"

@@ -27,6 +27,9 @@ def get_all_reports(db: Session = Depends(database.get_db)):
             "patient": {
                 "id": r.patient.id,
                 "name": r.patient.name
+            } if r.patient else {
+                "id": None,
+                "name": "Unknown"
             },
             "report_type": r.report_type,
             "report_data": json.loads(r.report_data)

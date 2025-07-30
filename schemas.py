@@ -6,7 +6,7 @@ class PatientBase(BaseModel):
     age: int
     gender: str
     phone: str
-    city: str
+    city:  str
     
 class PatientCreate(PatientBase):
     pass
